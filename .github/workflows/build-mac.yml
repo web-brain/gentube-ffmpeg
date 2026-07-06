@@ -50,3 +50,5 @@ jobs:
             sources/*.tar.*
             sources/MANIFEST.txt
             LICENSES/*
+
+# reindex
