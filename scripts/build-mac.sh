@@ -51,11 +51,15 @@ unpack "fontconfig-${FONTCONFIG_VERSION}.tar.xz" "fontconfig-${FONTCONFIG_VERSIO
 # sysconfdir는 prefix 내부로 — CI 권한 문제 회피 + 시스템 오염 방지 (gentube는 subtitles에 fontsdir를 명시 전달하므로 시스템 설정 경로 불필요)
 ( cd "fontconfig-${FONTCONFIG_VERSION}" && ./configure --prefix="$PREFIX" --disable-shared --enable-static --disable-docs --sysconfdir="$PREFIX/etc" -q && make -j"$JOBS" -s && make install -s )
 
-echo "===== 6) libass ====="
+echo "===== 6) libunibreak (CJK 자동 줄바꿈 — libass ASS_FEATURE_WRAP_UNICODE 활성화) ====="
+unpack "libunibreak-${LIBUNIBREAK_VERSION}.tar.gz" "libunibreak-${LIBUNIBREAK_VERSION}"
+( cd "libunibreak-${LIBUNIBREAK_VERSION}" && ./configure --prefix="$PREFIX" --disable-shared --enable-static -q && make -j"$JOBS" -s && make install -s )
+
+echo "===== 7) libass ====="
 unpack "libass-${LIBASS_VERSION}.tar.xz" "libass-${LIBASS_VERSION}"
 ( cd "libass-${LIBASS_VERSION}" && ./configure --prefix="$PREFIX" --disable-shared --enable-static -q && make -j"$JOBS" -s && make install -s )
 
-echo "===== 7) x264 (GPL) ====="
+echo "===== 8) x264 (GPL) ====="
 unpack "x264-${X264_BRANCH}.tar.bz2" "x264-${X264_BRANCH}"
 ( cd "x264-${X264_BRANCH}" && ./configure --prefix="$PREFIX" --enable-static --disable-cli --enable-pic >/dev/null && make -j"$JOBS" -s && make install -s )
 

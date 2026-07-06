@@ -23,6 +23,7 @@ fetch "freetype-${FREETYPE_VERSION}.tar.xz"    "https://download.savannah.gnu.or
 fetch "fribidi-${FRIBIDI_VERSION}.tar.xz"      "https://github.com/fribidi/fribidi/releases/download/v${FRIBIDI_VERSION}/fribidi-${FRIBIDI_VERSION}.tar.xz"
 fetch "harfbuzz-${HARFBUZZ_VERSION}.tar.xz"    "https://github.com/harfbuzz/harfbuzz/releases/download/${HARFBUZZ_VERSION}/harfbuzz-${HARFBUZZ_VERSION}.tar.xz"
 fetch "fontconfig-${FONTCONFIG_VERSION}.tar.xz" "https://www.freedesktop.org/software/fontconfig/release/fontconfig-${FONTCONFIG_VERSION}.tar.xz"
+fetch "libunibreak-${LIBUNIBREAK_VERSION}.tar.gz" "https://github.com/adah1972/libunibreak/releases/download/libunibreak_$(echo "$LIBUNIBREAK_VERSION" | tr . _)/libunibreak-${LIBUNIBREAK_VERSION}.tar.gz"
 fetch "libass-${LIBASS_VERSION}.tar.xz"        "https://github.com/libass/libass/releases/download/${LIBASS_VERSION}/libass-${LIBASS_VERSION}.tar.xz"
 
 echo ""
@@ -30,7 +31,7 @@ echo "== MANIFEST 생성 (sha256 + 크기 + 확보일) =="
 {
     echo "# gentube-ffmpeg corresponding source manifest"
     echo "# 확보일: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    echo "# versions.env: FFMPEG=${FFMPEG_VERSION} X264=${X264_BRANCH} EXPAT=${EXPAT_VERSION} FREETYPE=${FREETYPE_VERSION} FRIBIDI=${FRIBIDI_VERSION} HARFBUZZ=${HARFBUZZ_VERSION} FONTCONFIG=${FONTCONFIG_VERSION} LIBASS=${LIBASS_VERSION}"
+    echo "# versions.env: FFMPEG=${FFMPEG_VERSION} X264=${X264_BRANCH} EXPAT=${EXPAT_VERSION} FREETYPE=${FREETYPE_VERSION} FRIBIDI=${FRIBIDI_VERSION} HARFBUZZ=${HARFBUZZ_VERSION} FONTCONFIG=${FONTCONFIG_VERSION} LIBUNIBREAK=${LIBUNIBREAK_VERSION} LIBASS=${LIBASS_VERSION}"
     echo ""
     shasum -a 256 *.tar.* 2>/dev/null || sha256sum *.tar.*
     echo ""
