@@ -48,7 +48,8 @@ unpack "harfbuzz-${HARFBUZZ_VERSION}.tar.xz" "harfbuzz-${HARFBUZZ_VERSION}"
 
 echo "===== 5) fontconfig ====="
 unpack "fontconfig-${FONTCONFIG_VERSION}.tar.xz" "fontconfig-${FONTCONFIG_VERSION}"
-( cd "fontconfig-${FONTCONFIG_VERSION}" && ./configure --prefix="$PREFIX" --disable-shared --enable-static --disable-docs --sysconfdir=/usr/local/etc -q && make -j"$JOBS" -s && make install -s )
+# sysconfdir는 prefix 내부로 — CI 권한 문제 회피 + 시스템 오염 방지 (gentube는 subtitles에 fontsdir를 명시 전달하므로 시스템 설정 경로 불필요)
+( cd "fontconfig-${FONTCONFIG_VERSION}" && ./configure --prefix="$PREFIX" --disable-shared --enable-static --disable-docs --sysconfdir="$PREFIX/etc" -q && make -j"$JOBS" -s && make install -s )
 
 echo "===== 6) libass ====="
 unpack "libass-${LIBASS_VERSION}.tar.xz" "libass-${LIBASS_VERSION}"
