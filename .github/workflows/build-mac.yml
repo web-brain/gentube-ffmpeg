@@ -5,6 +5,9 @@ on:
   push:
     tags: ['v*']
 
+permissions:
+  contents: write   # 릴리스 생성/자산 업로드에 필요
+
 jobs:
   build:
     runs-on: macos-14   # Apple Silicon (arm64) 러너
