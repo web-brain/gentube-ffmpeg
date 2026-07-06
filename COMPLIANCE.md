@@ -24,7 +24,7 @@ GenTube 데스크탑 앱은 FFmpeg를 **별도 실행 파일**로 번들하고 s
 
 > 이 소프트웨어는 GNU General Public License(GPL)로 라이선스된 FFmpeg(https://ffmpeg.org) 및 x264 라이브러리를 포함한 빌드를 별도 실행 파일로 사용합니다. FFmpeg 바이너리는 본 애플리케이션에 링크되지 않고 독립 프로세스로 실행됩니다.
 > 배포된 바이너리의 완전한 대응 소스 코드(정확한 소스 아카이브, 빌드 스크립트, 빌드 설정 포함)는 다음에서 제공됩니다:
-> **https://github.com/<OWNER>/gentube-ffmpeg/releases**
+> **https://github.com/web-brain/gentube-ffmpeg/releases**
 >
 > This software uses builds of FFmpeg (https://ffmpeg.org) and the x264 library, licensed under the GNU General Public License, executed as separate processes (not linked into this application). The complete corresponding source code — including exact source archives, build scripts, and configuration — is available at the URL above.
 
