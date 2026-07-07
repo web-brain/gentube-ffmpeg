@@ -1,28 +1,34 @@
-# Windows x64 빌드 — 완료 (2026-07-07)
+# Windows x64 빌드 — 최소 구성 완료 (2026-07-08)
 
-GenTube의 `resources/ffmpeg-win/`은 **web-brain/FFmpeg-Builds**(BtbN/FFmpeg-Builds 포크)에서 빌드한
-win64-gpl 정적 바이너리로 교체됨. 기존 gyan.dev 빌드(빌드 스크립트 비공개 → 대응 소스 제공 불가)를 대체.
+GenTube의 `resources/ffmpeg-win/`은 **web-brain/gentube-ffmpeg-win**(BtbN/FFmpeg-Builds 포크)의
+**최소 구성** win64-gpl 정적 바이너리. 기존 gyan.dev 빌드(대응 소스 제공 불가) → BtbN 풀빌드(임시)
+→ **최소 구성 빌드**(최종) 순으로 교체됨.
+
+## 최소 구성 (2026-07-08 확정)
+
+- FFmpeg **n8.1.2** 태그 핀 고정 (`addins/gentube81.sh`)
+- scripts.d 81개 → **15개 트림**: x264 + LAME + libass 스택(freetype/harfbuzz/fribidi/fontconfig/libunibreak/libxml2) + zlib/iconv + mingw 툴체인
+- `--enable-version3` 제거 → **GPL-2.0-or-later** (mac 빌드와 등급 통일)
+- 크기: exe당 144MB(풀빌드) → **39.6MB**
 
 ## 빌드 소스 (GPL corresponding source)
 
-- **포크 리포**: https://github.com/web-brain/FFmpeg-Builds (퍼블릭)
-  - 전 의존성이 `scripts.d/*.sh`에 커밋 단위로 핀 고정(SCRIPT_COMMIT/SCRIPT_REV) → 완전 재현 가능
-  - gyan.dev와 결정적 차이: **빌드 정의가 전부 공개·핀 고정**되어 누구나 동일 소스 세트 재구성 가능
-- **릴리스**: autobuild-2026-07-07-06-11 (`ffmpeg-N-125483-g160737cf0d-win64-gpl.zip`)
-  - FFmpeg 소스 커밋: `160737cf0d` (바이너리명에 포함)
-- 포크에서 win64-gpl/lgpl만 빌드하도록 매트릭스 트림 (win32/arm/linux 제거)
+- **포크 리포**: https://github.com/web-brain/gentube-ffmpeg-win (퍼블릭, 구 FFmpeg-Builds에서 개명)
+  - 전 의존성이 `scripts.d/*.sh`에 커밋 단위로 핀 고정(SCRIPT_COMMIT) → 완전 재현 가능
+- **릴리스**: **v8.1.2-1** (`ffmpeg-n8.1.2-win64-gpl-gentube81.zip`)
+  - 정적 링크된 **전 의존성 소스 타르볼 11종 + FFmpeg n8.1.2 소스 + BUILDINFO + GPL 전문 + SHA256SUMS 동봉**
+  - → GPLv2 §3 대응 소스 제공 의무 이행 완료 (mac v8.1-2와 동일 방식)
 
-## 검증 (mac에서 실행 없이 정적 검증 — win 바이너리라 로컬 실행 불가)
+## 검증 (mac에서 정적 검증 — win 바이너리라 로컬 실행 불가)
 
-- ✅ PE32+ x86-64 (`file`)
-- ✅ **완전 정적**: PE import table(objdump -p) — import 38개 전부 Windows 시스템 DLL(kernel32/user32/DWrite/d2d1 등), ffmpeg 종속 DLL(libav*/libx264/libmp3lame/zlib 등) **0개**. mac에서 겪은 dylib 누출과 달리 BtbN win 빌드는 설계상 정적.
-- ✅ buildconf(strings): `--enable-gpl --enable-libx264 --enable-libmp3lame`, `--enable-nonfree` **없음**(재배포 가능)
-- ✅ libass 스택(libass/libfreetype/libharfbuzz/libfribidi/fontconfig) + 필터(subtitles/zoompan/vignette/loudnorm) 존재
-- ✅ libunibreak: libass 내부 의존(BtbN 45-libunibreak.sh→50-libass.sh)으로 CJK 줄바꿈 지원 (mac 이슈와 동일하게 해결)
+- ✅ **완전 정적**: PE import table(objdump -p) — 전부 Windows 시스템 DLL, 서드파티 DLL **0개**
+- ✅ configure(NUL 종단 직접 추출): `--enable-gpl` + x264/lame/libass 스택만, `--enable-version3`/`--enable-nonfree` **없음**
+- ✅ 라이선스 배너: "GPL version 2 or later" / zip 동봉 LICENSE.txt = GPLv2 전문
+- ✅ 디코더: configure에 disable 계열 없음 → FFmpeg 내장 디코더 전체 유지
+- ✅ `npm run setup:ffmpeg`(gentube)로 릴리스 다운로드→체크섬 검증→배치 자동화, 번들과 sha256 일치 확인
 - ⚠️ **실제 렌더 확인은 Windows 기기 필요** (mac에선 .exe 실행 불가)
 
-## 후속 (선택)
+## 이력
 
-- GPL 대응 소스 강화: 포크가 공개·핀 고정이라 재현 가능하나, 실제 소스 타르볼 아카이브(download.sh 산출)를 릴리스에 첨부하면 더 견고
-- 기존 win 바이너리 백업: /tmp/ffmpeg-win-old-backup (구 gyan 빌드)
-- 앱 고지(T7): win 소스 링크 = https://github.com/web-brain/FFmpeg-Builds
+- 기존 win 바이너리 백업: /tmp/ffmpeg-win-old-backup (구 gyan), /tmp/ffmpeg-win-fullbuild-backup (BtbN 풀빌드)
+- 앱 고지(T7): win 소스 링크 = https://github.com/web-brain/gentube-ffmpeg-win/releases
