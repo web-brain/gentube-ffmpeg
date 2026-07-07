@@ -1,24 +1,28 @@
-# Windows x64 빌드 계획 (미구현 — 다음 마일스톤)
+# Windows x64 빌드 — 완료 (2026-07-07)
 
-현재 GenTube의 `resources/ffmpeg-win/`은 gyan.dev 8.0.1 essentials(GPLv3)를 사용 중이다.
-gyan.dev는 빌드 스크립트가 비공개이고 정적 링크된 라이브러리들의 릴리스별 소스 아카이브를 제공하지 않아,
-**대응 소스 제공 의무를 자력으로 이행할 수 없다** → 교체 필요.
+GenTube의 `resources/ffmpeg-win/`은 **web-brain/FFmpeg-Builds**(BtbN/FFmpeg-Builds 포크)에서 빌드한
+win64-gpl 정적 바이너리로 교체됨. 기존 gyan.dev 빌드(빌드 스크립트 비공개 → 대응 소스 제공 불가)를 대체.
 
-## 채택 방안: BtbN/FFmpeg-Builds 포크
+## 빌드 소스 (GPL corresponding source)
 
-[BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds)는:
-- 빌드 스크립트 전체 공개(MIT), 의존성이 `scripts.d/*.sh`에 **커밋 단위로 핀 고정** (예: `50-x264.sh`의 `SCRIPT_COMMIT`)
-- 퍼블릭 GitHub Actions 빌드, win64 gpl/lgpl 변형 지원
+- **포크 리포**: https://github.com/web-brain/FFmpeg-Builds (퍼블릭)
+  - 전 의존성이 `scripts.d/*.sh`에 커밋 단위로 핀 고정(SCRIPT_COMMIT/SCRIPT_REV) → 완전 재현 가능
+  - gyan.dev와 결정적 차이: **빌드 정의가 전부 공개·핀 고정**되어 누구나 동일 소스 세트 재구성 가능
+- **릴리스**: autobuild-2026-07-07-06-11 (`ffmpeg-N-125483-g160737cf0d-win64-gpl.zip`)
+  - FFmpeg 소스 커밋: `160737cf0d` (바이너리명에 포함)
+- 포크에서 win64-gpl/lgpl만 빌드하도록 매트릭스 트림 (win32/arm/linux 제거)
 
-## 작업 순서
+## 검증 (mac에서 실행 없이 정적 검증 — win 바이너리라 로컬 실행 불가)
 
-1. BtbN 포크 → `scripts.d/`에서 GenTube가 쓰지 않는 라이브러리 스크립트 제거 (유지: x264 + libass 스택[freetype/fribidi/harfbuzz/fontconfig] + 기본 코덱)
-2. 본인 Actions로 win64 gpl(+lgpl) 빌드
-3. 빌드 시점에 각 `SCRIPT_COMMIT` 소스를 tar로 아카이브 → 이 리포 릴리스에 첨부 (mac과 동일한 컴플라이언스 킷 형태)
-4. GenTube `resources/ffmpeg-win/` 교체 → 전체 E2E
-5. 교체 전까지의 잠정 조치: 현 gyan 빌드에 대해 GPLv3 텍스트 + gyan 소스 링크(FFmpeg 커밋)를 고지 — 완전하지 않으므로 조속히 교체
+- ✅ PE32+ x86-64 (`file`)
+- ✅ **완전 정적**: PE import table(objdump -p) — import 38개 전부 Windows 시스템 DLL(kernel32/user32/DWrite/d2d1 등), ffmpeg 종속 DLL(libav*/libx264/libmp3lame/zlib 등) **0개**. mac에서 겪은 dylib 누출과 달리 BtbN win 빌드는 설계상 정적.
+- ✅ buildconf(strings): `--enable-gpl --enable-libx264 --enable-libmp3lame`, `--enable-nonfree` **없음**(재배포 가능)
+- ✅ libass 스택(libass/libfreetype/libharfbuzz/libfribidi/fontconfig) + 필터(subtitles/zoompan/vignette/loudnorm) 존재
+- ✅ libunibreak: libass 내부 의존(BtbN 45-libunibreak.sh→50-libass.sh)으로 CJK 줄바꿈 지원 (mac 이슈와 동일하게 해결)
+- ⚠️ **실제 렌더 확인은 Windows 기기 필요** (mac에선 .exe 실행 불가)
 
-## 참고
+## 후속 (선택)
 
-- Windows는 hw 인코더 폴백이 다양(NVENC/QSV/AMF/h264_mf) — lgpl 변형 전환 시 유리
-- NSIS 인스톨러에 LICENSES/ 동봉은 GenTube 쪽 T7(고지 페이지) 작업에서 처리
+- GPL 대응 소스 강화: 포크가 공개·핀 고정이라 재현 가능하나, 실제 소스 타르볼 아카이브(download.sh 산출)를 릴리스에 첨부하면 더 견고
+- 기존 win 바이너리 백업: /tmp/ffmpeg-win-old-backup (구 gyan 빌드)
+- 앱 고지(T7): win 소스 링크 = https://github.com/web-brain/FFmpeg-Builds
